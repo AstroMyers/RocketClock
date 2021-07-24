@@ -6,7 +6,7 @@ import platform
 from datetime import datetime
 import pytz
 
-url =  "https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=false&include_suborbital=true&related=false&hide_recent_previous=true" #api to get info from
+url =  "https://ll.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=false&include_suborbital=true&related=false&hide_recent_previous=true" #api to get info from
 response = requests.get(url)
 launch_info = json.loads(response.text) #get json with info
 
@@ -49,11 +49,8 @@ def Time(time):
     time_list[19] ='' #remove characters
     time_format = ''.join(time_list) #list -> str
     time_date = datetime.strptime(time_format,'%Y-%m-%d %H:%M:%S') #str -> date obj
-    timezone = pytz.timezone("America/Denver")
-    time_date_aware = timezone.localize(time_date)
     now = datetime.utcnow()
-    now_aware = timezone.localize(now)
-    deltatime =  time_date_aware - now_aware 
+    deltatime =  time_date - now
    
     return deltatime
     
