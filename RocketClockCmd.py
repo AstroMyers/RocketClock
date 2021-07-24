@@ -22,6 +22,8 @@ def SystemDetect():
         reset = 'cls'
     elif system == 'Linux':
         reset = 'clear'
+    elif system == 'Darwin':
+        reset  = 'claear'
     os.system(reset)
     print('System Detected: ',system)
     sleep(2)
