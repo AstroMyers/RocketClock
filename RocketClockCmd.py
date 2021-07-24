@@ -50,6 +50,7 @@ def UpdateLaunch(url): #ping API once to update to newest upcom2ing launch value
     print('Status: ', status)
     print('Location: ', location)
     print('Time: ', time)
+    print('\n')
     return time
     
 def Time(time):
@@ -61,7 +62,7 @@ def Time(time):
     time_date = datetime.strptime(time_format,'%Y-%m-%d %H:%M:%S') #str -> date obj
     now = datetime.utcnow()
     deltatime =  time_date - now
-    print('\nCountdown: ' + str(deltatime), end='\r')
+    print('Countdown: ' + str(deltatime), end='\r')
     return deltatime
     
 def Launch():
@@ -77,12 +78,16 @@ def Launch():
     sleep(3)
     UpdateLaunch(url)
     
-Init()
-Time(time)
-while True:
-    while deltatime.total_seconds() < 1:
-        Launch()
-        break
-    while deltatime.total_seconds() > 1:
-        Time(time)
-        break
+def main():
+    while True:
+        while deltatime.total_seconds() < 1:
+            Launch()
+            break
+        while deltatime.total_seconds() > 1:
+            Time(time)
+            break
+
+if __name__ == '__main__':
+    Init()
+    Time(time)
+    main()
