@@ -9,6 +9,12 @@ url =  "https://ll.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=false&inclu
 response = requests.get(url)
 launch_info = json.loads(response.text) #get json with info
 
+def Init():
+    SystemDetect()
+    UpdateLaunch(url)
+    sleep(1)
+    Time(time)
+
 def SystemDetect():
     global reset
     system = platform.system()
@@ -50,28 +56,27 @@ def Time(time):
     time_date = datetime.strptime(time_format,'%Y-%m-%d %H:%M:%S') #str -> date obj
     now = datetime.utcnow()
     deltatime =  time_date - now
-   
+    print(str(deltatime), end='\r')
     return deltatime
     
-SystemDetect()
-UpdateLaunch(url)
-sleep(1)
-Time(time)
+def Launch():
+    os.system(reset)
+    print('Launching!')
+    sleep(.5)
+    print('Launching!')
+    sleep(.5)
+    print('Launching!')
+    sleep(3)
+    os.system(reset)
+    print('Retreiving Next Launch...')
+    sleep(3)
+    UpdateLaunch(url)
+    
+Init()
 while True:
     while deltatime.total_seconds() < 1:
-        os.system(reset)
-        print('Launching!')
-        sleep(.5)
-        print('Launching!')
-        sleep(.5)
-        print('Launching!')
-        sleep(3)
-        os.system(reset)
-        print('Retreiving Next Launch...')
-        sleep(3)
-        UpdateLaunch(url)
+        Launch()
         break
     while deltatime.total_seconds() > 1:
         Time(time)
-        print(str(deltatime), end='\r')
         break
