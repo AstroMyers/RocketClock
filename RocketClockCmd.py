@@ -4,7 +4,6 @@ from time import sleep
 import os
 import platform
 from datetime import datetime
-import pytz
 
 url =  "https://ll.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=false&include_suborbital=true&related=false&hide_recent_previous=true" #api to get info from
 response = requests.get(url)
