@@ -5,7 +5,7 @@ import os
 import platform
 from datetime import datetime
 
-url =  "https://lldev.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=false&include_suborbital=true&related=false&hide_recent_previous=true" #api to get info from
+url =  "https://ll.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=false&include_suborbital=true&related=false&hide_recent_previous=true" #api to get info from
 response = requests.get(url)
 launch_info = json.loads(response.text) #get json with info
 
@@ -73,5 +73,5 @@ while True:
         break
     while deltatime.total_seconds() > 1:
         Time(time)
-        print(str(deltatime),end='\r')
+        print(str(deltatime), end='\r')
         break
