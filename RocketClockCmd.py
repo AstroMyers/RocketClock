@@ -16,7 +16,6 @@ def SystemDetect():
         reset  = 'clear'
     os.system(reset)
     print('System Detected: ',system)
-    sleep(1)
     print('Fetching Data\n')
     sleep(1)
     return reset
