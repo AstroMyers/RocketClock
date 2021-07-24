@@ -5,16 +5,6 @@ import os
 import platform
 from datetime import datetime
 
-url =  "https://ll.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=false&include_suborbital=true&related=false&hide_recent_previous=true" #api to get info from
-response = requests.get(url)
-launch_info = json.loads(response.text) #get json with info
-
-def Init():
-    SystemDetect()
-    UpdateLaunch(url)
-    sleep(1)
-    Time(time)
-
 def SystemDetect():
     global reset
     system = platform.system()
@@ -23,16 +13,29 @@ def SystemDetect():
     elif system == 'Linux':
         reset = 'clear'
     elif system == 'Darwin':
-        reset  = 'claear'
+        reset  = 'clear'
     os.system(reset)
     print('System Detected: ',system)
-    sleep(2)
+    sleep(1)
     print('Fetching Data\n')
-    sleep(2)
-    os.system(reset)
+    sleep(1)
     return reset
 
-def UpdateLaunch(url): #ping API once to update to newest upcoming launch values
+def Init():
+    global url
+    SystemDetect()
+    mode = input('Press 1 for Dev Mode or 2 for Live Mode:\n')
+    if mode == '1':
+        dev = 'dev'
+    elif mode == '2':
+        dev = ''
+    url =  "https://ll" + dev + '.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=false&include_suborbital=true&related=false&hide_recent_previous=true' #api to get info from
+    os.system(reset)
+    UpdateLaunch(url)
+    sleep(1)
+    return url
+    
+def UpdateLaunch(url): #ping API once to update to newest upcom2ing launch values
     global time
     time = []
     response = requests.get(url)
@@ -58,7 +61,7 @@ def Time(time):
     time_date = datetime.strptime(time_format,'%Y-%m-%d %H:%M:%S') #str -> date obj
     now = datetime.utcnow()
     deltatime =  time_date - now
-    print(str(deltatime), end='\r')
+    print('Countdown: ' + str(deltatime), end='\r')
     return deltatime
     
 def Launch():
@@ -75,6 +78,7 @@ def Launch():
     UpdateLaunch(url)
     
 Init()
+Time(time)
 while True:
     while deltatime.total_seconds() < 1:
         Launch()
