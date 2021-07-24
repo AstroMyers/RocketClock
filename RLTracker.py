@@ -7,6 +7,13 @@ from datetime import datetime
 import cartopy.crs as ccrs                # Mapping
 import matplotlib.pyplot as plt 
 
+#!apt-get install libproj-dev proj-data proj-bin
+#!apt-get install libgeos-dev
+#!pip install cython
+#pip install cartopy
+
+
+
 def SystemDetect():
     global reset
     system = platform.system()
