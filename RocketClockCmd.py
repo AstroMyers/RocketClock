@@ -39,16 +39,23 @@ def UpdateLaunch(url): #ping API once to update to newest upcom2ing launch value
     time = []
     response = requests.get(url)
     launch_info = json.loads(response.text)
+    
     provider = launch_info['results'][0]['launch_service_provider']['name']
     mission =launch_info['results'][0]['name']
     status = launch_info['results'][0]['status']['name']
-    location = launch_info['results'][0]['pad']['name']+ ', ' + launch_info['results'][0]['pad']['location']['name']
+    location = launch_info['results'][0]['pad']['name'] + ', ' + launch_info['results'][0]['pad']['location']['name']
+    latitude =  launch_info['results'][0]['pad']['latitude']
+    lognitude =  launch_info['results'][0]['pad']['longitude']
+    window_start = launch_info['results'][0]['window_start']
+    window_end = launch_info['results'][0]['window_end']
     time = launch_info['results'][0]['net']
     print('Provider: ', provider)
     print('Mission: ', mission)
     print('Status: ', status)
     print('Location: ', location)
     print('Time: ', time)
+    print('Window Start: ',window_start, '| Window End: ',window_end)
+    print(latitude,lognitude)
     print('\n')
     Time(time)
     
@@ -71,6 +78,7 @@ def Launch():
     os.system(reset)
     print('Retreiving Next Launch...')
     sleep(10)
+    os.system(reset)
     UpdateLaunch(url)
     main()
     
