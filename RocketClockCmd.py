@@ -50,7 +50,7 @@ def UpdateLaunch(url): #ping API once to update to newest upcom2ing launch value
     print('Location: ', location)
     print('Time: ', time)
     print('\n')
-    return time
+    Time(time)
     
 def Time(time):
     global deltatime
@@ -66,22 +66,18 @@ def Time(time):
     
 def Launch():
     os.system(reset)
-    print('Launching!')
-    sleep(.5)
-    print('Launching!')
-    sleep(.5)
-    print('Launching!')
-    sleep(3)
+    print('Launch Imminent!')
+    sleep(5)
     os.system(reset)
     print('Retreiving Next Launch...')
-    sleep(3)
+    sleep(10)
     UpdateLaunch(url)
+    main()
     
 def main():
     while True:
         while deltatime.total_seconds() < 1:
             Launch()
-            break
         while deltatime.total_seconds() > 1:
             Time(time)
             break
