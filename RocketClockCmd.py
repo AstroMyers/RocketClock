@@ -61,7 +61,7 @@ def Time(time):
     time_date = datetime.strptime(time_format,'%Y-%m-%d %H:%M:%S') #str -> date obj
     now = datetime.utcnow()
     deltatime =  time_date - now
-    print('Countdown: ' + str(deltatime), end='\r')
+    print('\nCountdown: ' + str(deltatime), end='\r')
     return deltatime
     
 def Launch():
