@@ -3,8 +3,7 @@ import json
 from time import sleep
 import os
 import platform
-from datetime import datetime
-import cartopy.crs as ccrs                # Mapping
+from datetime import datetime               # Mapping
 import matplotlib.pyplot as plt 
 
 #!apt-get install libproj-dev proj-data proj-bin
@@ -64,13 +63,9 @@ def UpdateLaunch(url): #ping API once to update to newest upcom2ing launch value
     print('Location: ', location)
     print('Time: ', time)
     print('Window Start: ',window_start, '| Window End: ',window_end)
-    print(latitude,longitude)
+    print('Latitude: ',latitude, '| Longitude: ',longitude)
     print('\n')
     
-    plt.plot([float(longitude)], [float(latitude)], color='red', marker='o', markersize=6,transform=ccrs.PlateCarree())
-    ax = plt.axes(projection=ccrs.PlateCarree())
-    ax.stock_img()
-    plt.show()
     Time(time)
     
 def Time(time):
