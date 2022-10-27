@@ -11,17 +11,12 @@ import matplotlib.pyplot as plt
 #!pip install cython
 #pip install cartopy
 
-
-
 def SystemDetect():
-    global reset
     system = platform.system()
     if system == 'Windows':
         reset = 'cls'
-    elif system == 'Linux':
+    elif system == 'Linux' or 'Darwin':
         reset = 'clear'
-    elif system == 'Darwin':
-        reset  = 'clear'
     os.system(reset)
     print('System Detected: ',system)
     print('Fetching Data\n')
@@ -29,21 +24,18 @@ def SystemDetect():
     return reset
 
 def Init():
-    global url
-    SystemDetect()
+    reset = SystemDetect()
     mode = input('Press 1 for Dev Mode or 2 for Live Mode:\n')
     if mode == '1':
         dev = 'dev'
     elif mode == '2':
         dev = ''
-    url =  "https://ll" + dev + '.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=false&include_suborbital=true&related=false&hide_recent_previous=true' #api to get info from
+    url =  "https://ll" + dev + '.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=true&include_suborbital=true&related=false&hide_recent_previous=true' #api to get info from
     os.system(reset)
-    UpdateLaunch(url)
     sleep(1)
-    return url
+    return url, reset
     
 def UpdateLaunch(url): #ping API once to update to newest upcom2ing launch values
-    global time
     time = []
     response = requests.get(url)
     launch_info = json.loads(response.text)
@@ -65,11 +57,10 @@ def UpdateLaunch(url): #ping API once to update to newest upcom2ing launch value
     print('Window Start: ',window_start, '| Window End: ',window_end)
     print('Latitude: ',latitude, '| Longitude: ',longitude)
     print('\n')
-    
     Time(time)
+    return time
     
 def Time(time):
-    global deltatime
     time_list = list(str(time)) #str -> list
     time_list[10] = ' ' #remove characters
     time_list[19] ='' #remove characters
@@ -80,7 +71,7 @@ def Time(time):
     print('Countdown: ' + str(deltatime), end='\r')
     return deltatime
     
-def Launch():
+def Launch(reset, url):
     os.system(reset)
     print('Launch Imminent!')
     sleep(5)
@@ -91,15 +82,16 @@ def Launch():
     UpdateLaunch(url)
     main()
     
-def main():
+def main(deltatime, reset, url):
     while True:
         while deltatime.total_seconds() < 1:
-            Launch()
+            Launch(reset, url)
         while deltatime.total_seconds() > 1:
             Time(time)
             break
 
 if __name__ == '__main__':
-    Init()
-    Time(time)
-    main()
+    url, reset = Init()
+    time = UpdateLaunch(url)
+    deltatime = Time(time)
+    main(deltatime, reset, url)
