@@ -6,10 +6,8 @@ import platform
 from datetime import datetime               # Mapping
 import matplotlib.pyplot as plt 
 
-#!apt-get install libproj-dev proj-data proj-bin
-#!apt-get install libgeos-dev
-#!pip install cython
-#pip install cartopy
+#this script was created to pull live upcoming rocket launch data and display it in a command line interface
+
 
 def SystemDetect():
     system = platform.system()
@@ -39,7 +37,6 @@ def UpdateLaunch(url): #ping API once to update to newest upcom2ing launch value
     time = []
     response = requests.get(url)
     launch_info = json.loads(response.text)
-    
     provider = launch_info['results'][0]['launch_service_provider']['name']
     mission =launch_info['results'][0]['name']
     status = launch_info['results'][0]['status']['name']
@@ -77,7 +74,7 @@ def Launch(reset, url):
     sleep(5)
     os.system(reset)
     print('Retreiving Next Launch...')
-    sleep(10)
+    sleep(5)
     os.system(reset)
     UpdateLaunch(url)
     main()
