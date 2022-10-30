@@ -1,13 +1,14 @@
-import requests
-import json
+import requests, json, os, platform, math
 from time import sleep
-import os
-import platform
-from datetime import datetime               # Mapping
-import matplotlib.pyplot as plt 
+from mpl_toolkits.basemap import Basemap
+from datetime import datetime   
+import matplotlib
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
 
+matplotlib.use('TkAgg')
 #this script was created to pull live upcoming rocket launch data and display it in a command line interface
-
 
 def SystemDetect():
     system = platform.system()
@@ -28,12 +29,11 @@ def Init():
         dev = 'dev'
     elif mode == '2':
         dev = ''
-    url =  "https://ll" + dev + '.thespacedevs.com/2.2.0/launch/upcoming/?is_crewed=true&include_suborbital=true&related=false&hide_recent_previous=true' #api to get info from
+    url =  "https://ll" + dev + '.thespacedevs.com/2.2.0/launch/upcoming/?include_suborbital=true&hide_recent_previous=true' #api to get info from
     os.system(reset)
-    sleep(1)
     return url, reset
     
-def UpdateLaunch(url): #ping API once to update to newest upcom2ing launch values
+def UpdateLaunch(url): #ping API once to update to newest upcoming launch values
     time = []
     response = requests.get(url)
     launch_info = json.loads(response.text)
@@ -46,23 +46,69 @@ def UpdateLaunch(url): #ping API once to update to newest upcom2ing launch value
     window_start = launch_info['results'][0]['window_start']
     window_end = launch_info['results'][0]['window_end']
     time = launch_info['results'][0]['net']
-    print('Provider: ', provider)
-    print('Mission: ', mission)
-    print('Status: ', status)
-    print('Location: ', location)
-    print('Time: ', time)
+    
+    def UTC_to_local():
+        pass
+    
+    print('Provider:     ', provider)
+    print('Mission:      ', mission)
+    print('Status:       ', status)
+    print('Location:     ', location)
+    print('Time:         ', time)
     print('Window Start: ',window_start, '| Window End: ',window_end)
-    print('Latitude: ',latitude, '| Longitude: ',longitude)
+    print('Latitude:     ',latitude, '| Longitude: ',longitude)
     print('\n')
     Time(time)
-    return time
+    return time, location, longitude, latitude
+
+def Location(location, longitude, latitude):
+    longitude, latitude = round(longitude, 2), round(latitude, 2)
+     
+    fig = plt.figure(figsize=(12,9))
     
+    m = Basemap(projection='merc',
+           llcrnrlat = -70,
+           urcrnrlat = 70,
+           llcrnrlon = -180,
+           urcrnrlon = 180,
+           resolution = 'c')
+    
+    if longitude > 0: 
+        longpos = 'E'
+    elif longitude < 0: 
+        longpos = 'W'
+    elif longitude > 180 or longitude < -180:
+        print('Invalid Longitude')
+    
+    if latitude > 0: 
+        latpos = 'N'
+    elif latitude < 0:
+        latpos = 'S'
+    elif latitude > 80 or latitude < -80:
+        print('Invalid Latitude')
+    
+    x_long, y_lat = m(longitude, latitude)
+    max_x, max_y = m(180, 80)
+    min_x, min_y = m(-180,-80)
+    
+    m.bluemarble(scale = 0.5)
+    m.drawparallels(np.arange(-90,90,10),linewidth ='0',labels=[True,False,False,False])
+    m.drawmeridians(np.arange(-180,180,30),linewidth ='0',labels=[0,0,0,1])
+    m.drawcountries(linewidth = 1)
+    m.drawcoastlines(linewidth = 1)
+    m.plot(x_long, y_lat, 'ro', markeredgecolor = 'black', markeredgewidth = '2', markersize = '7')
+    
+    plt.vlines(x_long, min_y, max_y, color = 'red', linestyles = 'dashed' )
+    plt.hlines(y_lat, min_x, max_x, color = 'red', linestyles = 'dashed')
+    plt.text(x_long + 500000, y_lat + 500000,f'{str(abs(latitude))+latpos}, {str(abs(longitude))+longpos}', color = 'white')
+    plt.title(str(location), fontsize='15')
+    plt.draw()
+    plt.pause(0.0001)
+
 def Time(time):
-    time_list = list(str(time)) #str -> list
-    time_list[10] = ' ' #remove characters
-    time_list[19] ='' #remove characters
-    time_format = ''.join(time_list) #list -> str
-    time_date = datetime.strptime(time_format,'%Y-%m-%d %H:%M:%S') #str -> date obj
+    time = time.replace('Z', '')
+    time = time.replace('T',' ')
+    time_date = datetime.strptime(time,'%Y-%m-%d %H:%M:%S') #str -> date obj
     now = datetime.utcnow()
     deltatime =  time_date - now
     print('Countdown: ' + str(deltatime), end='\r')
@@ -79,7 +125,8 @@ def Launch(reset, url):
     UpdateLaunch(url)
     main()
     
-def main(deltatime, reset, url):
+def main(deltatime, reset, url, location, longitude, latitude):
+    #Location(location, float(longitude), float(latitude)) for now can't really get this to work without blocking the countdown timer :(
     while True:
         while deltatime.total_seconds() < 1:
             Launch(reset, url)
@@ -89,6 +136,6 @@ def main(deltatime, reset, url):
 
 if __name__ == '__main__':
     url, reset = Init()
-    time = UpdateLaunch(url)
+    time, location, longitude, latitude = UpdateLaunch(url)
     deltatime = Time(time)
-    main(deltatime, reset, url)
+    main(deltatime, reset, url,location, longitude, latitude)
