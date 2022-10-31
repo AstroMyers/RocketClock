@@ -7,8 +7,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 
-matplotlib.use('TkAgg')
-#this script was created to pull live upcoming rocket launch data and display it in a command line interface
+#To do list
+# - Fix the plot blocking the countdown timer
+# - Convert UTC/GMT to local time 
 
 def SystemDetect():
     system = platform.system()
@@ -29,7 +30,7 @@ def Init():
         dev = 'dev'
     elif mode == '2':
         dev = ''
-    url =  "https://ll" + dev + '.thespacedevs.com/2.2.0/launch/upcoming/?include_suborbital=true&hide_recent_previous=true' #api to get info from
+    url =  "https://ll" + dev + '.thespacedevs.com/2.2.0/launch/upcoming/?include_suborbital=true&hide_recent_previous=true'
     os.system(reset)
     return url, reset
     
@@ -37,15 +38,22 @@ def UpdateLaunch(url): #ping API once to update to newest upcoming launch values
     time = []
     response = requests.get(url)
     launch_info = json.loads(response.text)
-    provider = launch_info['results'][0]['launch_service_provider']['name']
-    mission =launch_info['results'][0]['name']
-    status = launch_info['results'][0]['status']['name']
-    location = launch_info['results'][0]['pad']['name'] + ', ' + launch_info['results'][0]['pad']['location']['name']
-    latitude =  launch_info['results'][0]['pad']['latitude']
-    longitude =  launch_info['results'][0]['pad']['longitude']
-    window_start = launch_info['results'][0]['window_start']
-    window_end = launch_info['results'][0]['window_end']
-    time = launch_info['results'][0]['net']
+    
+    for i in range(0,len(launch_info)):
+        if launch_info['results'][i]['pad']['location']['country_code'] != 'USA':
+            pass
+        elif launch_info['results'][i]['pad']['location']['country_code'] == 'USA':
+            provider = launch_info['results'][i]['launch_service_provider']['name']
+            mission =launch_info['results'][i]['name']
+            status = launch_info['results'][i]['status']['name']
+            location = launch_info['results'][i]['pad']['name'] + ', ' + launch_info['results'][i]['pad']['location']['name']
+            latitude =  launch_info['results'][i]['pad']['latitude']
+            longitude =  launch_info['results'][i]['pad']['longitude']
+            window_start = launch_info['results'][i]['window_start']
+            window_end = launch_info['results'][i]['window_end']
+            time = launch_info['results'][i]['net']
+            break
+    
     
     def UTC_to_local():
         pass
@@ -62,28 +70,29 @@ def UpdateLaunch(url): #ping API once to update to newest upcoming launch values
     return time, location, longitude, latitude
 
 def Location(location, longitude, latitude):
-    longitude, latitude = round(longitude, 2), round(latitude, 2)
-     
-    fig = plt.figure(figsize=(12,9))
+    fig = plt.figure(figsize=(7,4))
     
     m = Basemap(projection='merc',
-           llcrnrlat = -70,
-           urcrnrlat = 70,
-           llcrnrlon = -180,
-           urcrnrlon = 180,
+           llcrnrlat = 23,
+           urcrnrlat = 53,
+           llcrnrlon = -130,
+           urcrnrlon = -60,
            resolution = 'c')
     
+    longitude, latitude = round(longitude, 2), round(latitude, 2)
+    location = location.split(", ")
+    
     if longitude > 0: 
-        longpos = 'E'
+        longpos = chr(176) +'E'
     elif longitude < 0: 
-        longpos = 'W'
+        longpos = chr(176) +'W'
     elif longitude > 180 or longitude < -180:
         print('Invalid Longitude')
     
     if latitude > 0: 
-        latpos = 'N'
+        latpos = chr(176) +'N'
     elif latitude < 0:
-        latpos = 'S'
+        latpos = chr(176) + 'S'
     elif latitude > 80 or latitude < -80:
         print('Invalid Latitude')
     
@@ -96,14 +105,17 @@ def Location(location, longitude, latitude):
     m.drawmeridians(np.arange(-180,180,30),linewidth ='0',labels=[0,0,0,1])
     m.drawcountries(linewidth = 1)
     m.drawcoastlines(linewidth = 1)
-    m.plot(x_long, y_lat, 'ro', markeredgecolor = 'black', markeredgewidth = '2', markersize = '7')
+    m.drawstates(linewidth = 1)
+    m.plot(x_long, y_lat, 'wo', markeredgecolor = 'black', markeredgewidth = '2', markersize = '7')
     
     plt.vlines(x_long, min_y, max_y, color = 'red', linestyles = 'dashed' )
     plt.hlines(y_lat, min_x, max_x, color = 'red', linestyles = 'dashed')
-    plt.text(x_long + 500000, y_lat + 500000,f'{str(abs(latitude))+latpos}, {str(abs(longitude))+longpos}', color = 'white')
-    plt.title(str(location), fontsize='15')
+    plt.text(x_long + 100000, y_lat +  550000,f'{location[0]}',color = 'white', size = 'small')
+    plt.text(x_long + 100000, y_lat +  350000,f'{location[1]}', color = 'white', size = 'small')
+    plt.text(x_long + 100000, y_lat +  150000,f'{str(abs(latitude))+ latpos}, {str(abs(longitude))+ longpos}' ,color = 'white', size = 'small')
+    #plt.title(str(location), fontsize='15')
     plt.draw()
-    plt.pause(0.0001)
+    plt.pause(5)
 
 def Time(time):
     time = time.replace('Z', '')
@@ -123,10 +135,10 @@ def Launch(reset, url):
     sleep(5)
     os.system(reset)
     UpdateLaunch(url)
-    main()
+    main(deltatime, reset, url, location, longitude, latitude)
     
 def main(deltatime, reset, url, location, longitude, latitude):
-    #Location(location, float(longitude), float(latitude)) for now can't really get this to work without blocking the countdown timer :(
+    Location(location, float(longitude), float(latitude)) #for now can't really get this to work without blocking the countdown timer :(
     while True:
         while deltatime.total_seconds() < 1:
             Launch(reset, url)
