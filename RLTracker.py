@@ -2,10 +2,8 @@ import requests, json, os, platform, math
 from time import sleep
 from mpl_toolkits.basemap import Basemap
 from datetime import datetime   
-import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 
 #To do list
 # - Fix the plot blocking the countdown timer
