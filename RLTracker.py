@@ -38,9 +38,7 @@ def UpdateLaunch(url): #ping API once to update to newest upcoming launch values
     launch_info = json.loads(response.text)
     
     for i in range(0,len(launch_info)):
-        if launch_info['results'][i]['pad']['location']['country_code'] != 'USA':
-            pass
-        elif launch_info['results'][i]['pad']['location']['country_code'] == 'USA':
+        if 'USA' in launch_info['results'][i]['pad']['location']['country_code']:
             provider = launch_info['results'][i]['launch_service_provider']['name']
             mission =launch_info['results'][i]['name']
             status = launch_info['results'][i]['status']['name']
@@ -51,8 +49,9 @@ def UpdateLaunch(url): #ping API once to update to newest upcoming launch values
             window_end = launch_info['results'][i]['window_end']
             time = launch_info['results'][i]['net']
             break
-    
-    
+        else:
+            pass
+            
     def UTC_to_local():
         pass
     
